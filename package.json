@@ -1,0 +1,24 @@
+{
+  "name": "ral-classic-api",
+  "version": "0.0.1",
+  "description": "A RAL classic colors api that gives the option to search based on id, name, rgb, cmyk, hue etc",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ral",
+    "ral",
+    "classic",
+    "colors",
+    "color",
+    "api"
+  ],
+  "author": "Sigmund Frost",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4"
+  }
+}
