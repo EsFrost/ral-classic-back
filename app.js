@@ -5,26 +5,19 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 const app = express();
-const port = 4000;
+const port = 8080;
 
-const allowedOrigins = ["http://192.168.1.190:3000", "http://localhost:3000"];
+// Configure CORS
+const corsOptions = {
+  origin: "*", // Allow all origins
+  methods: ["GET"], // Allow all methods
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        var msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-  })
-);
 app.use(helmet());
 
 const limiter = rateLimit({
@@ -34,16 +27,6 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-// Add this middleware to log incoming requests
-app.use((req, res, next) => {
-  console.log(
-    `${new Date().toISOString()} - ${req.method} ${req.url} - Origin: ${
-      req.headers.origin
-    }`
-  );
-  next();
-});
-
 app.use((req, res, next) => {
   res.setHeader(
     "Cache-Control",
@@ -52,15 +35,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api", colorRoutes);
+// Handle preflight requests
+app.options("*", cors(corsOptions));
 
-// Add a test route
-app.get("/test", (req, res) => {
-  res.send("Server is reachable");
-});
+app.use("/ral-classic/api", colorRoutes);
 
-const ip = "0.0.0.0"; // Listen on all available network interfaces
-app.listen(port, ip, () => {
-  console.log(`RAL Color API listening at http://${ip}:${port}`);
-  console.log(`Allowed origins: ${allowedOrigins.join(", ")}`);
+app.listen(port, () => {
+  console.log(`RAL Color API listening at http://localhost:${port}`);
+  console.log("CORS is now open to all origins");
 });
